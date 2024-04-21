@@ -7,6 +7,11 @@ namespace AuthenticatorTests
 {
     public class AuthenticatorUnitTests
     {
+        [Fact]
+        public void Test1()
+        {
+            
+        }
         
     }
 }
