@@ -15,7 +15,7 @@ public class TokenService
         _configuration = configuration;
     }
 
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] PasswordSalt)
+    public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] PasswordSalt)
     {
         using (var hmac = new HMACSHA256())
         {
@@ -23,7 +23,7 @@ public class TokenService
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
     }
-    private bool VerifyPassword(string password, byte[] passwordHash, byte[] PasswordSalt)
+    public bool VerifyPassword(string password, byte[] passwordHash, byte[] PasswordSalt)
     {
         using (var hmac = new HMACSHA256(PasswordSalt))
         {
