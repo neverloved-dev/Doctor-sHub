@@ -9,10 +9,12 @@ public class AuthenthicationController : Controller
 {
     private IConfiguration _configuration ;
     private TokenService _tokenService;
-    public AuthenthicationController(IConfiguration configuration,TokenService tokenService)
+    private UserService _userService;
+    public AuthenthicationController(IConfiguration configuration,TokenService tokenService,UserService userService)
     {
         this._configuration = configuration;
         this._tokenService = tokenService;
+        this._userService = userService;
     }
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(UserRegisterDTO request)
@@ -29,10 +31,13 @@ public class AuthenthicationController : Controller
     [HttpPost("login")]
     public async Task<ActionResult<User>> LogIn(UserLoginDTO request)
     {
-        if (user.Name != request.Name)
+        var userDto = _userService.getUserByEmail(request.Email);
+        if (userDto == null)
         {
-            return BadRequest("User not found!");
+            return NotFound("User not found!");
         }
+
+        var user = _userService.FindUserObjectByEmail(userDto.Email);
         if (!_tokenService.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
         {
             return BadRequest("Wrong password!");
