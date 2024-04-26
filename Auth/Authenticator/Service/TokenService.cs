@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using Authenticator.Models;
 
 namespace Authenticator.Service;
@@ -35,19 +36,24 @@ public class TokenService
 
     public string CreateToken(User user)
     {
-        List<Claim> claims = new List<Claim>
+        var tokenKeyValue = _configuration["AppSettings:Token"];
+        if (string.IsNullOrEmpty(tokenKeyValue))
         {
-            new Claim(ClaimTypes.Name, user.Name),
-        };
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-            _configuration.GetSection("AppSettings:Token").Value));
+            throw new InvalidOperationException("Token key is missing or empty in the configuration.");
+        }
 
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKeyValue));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(
-            claims: claims,
+            claims: new[]
+            {
+                new Claim(ClaimTypes.Name, user.Name),
+            },
             expires: DateTime.Now.AddDays(10),
-            signingCredentials: cred);
+            signingCredentials: cred
+        );
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
         return jwt;
     }
+
 }
