@@ -10,7 +10,7 @@ public class TokenService
 {
     private  IConfiguration _configuration;
 
-    TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -22,6 +22,7 @@ public class TokenService
             PasswordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
+        
     }
     public bool VerifyPassword(string password, byte[] passwordHash, byte[] PasswordSalt)
     {
