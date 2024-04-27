@@ -1,6 +1,6 @@
 namespace MainTests
 {
-    public class UnitTest1
+    public class DoctorRepositoryTests
     {
         [Fact]
         public void Test1()
