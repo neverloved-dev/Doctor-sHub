@@ -74,7 +74,7 @@ namespace AuthenticatorTests
             var user = new User { Name = "TestUser" };
 
             // Act
-             var token = tokenService.CreateToken(user);
+             var token = tokenService.CreateToken(user,Roles.Admin);
 
             // Assert
             Assert.NotNull(token);

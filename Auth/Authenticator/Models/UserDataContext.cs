@@ -7,5 +7,7 @@ public class UserDataContext:DbContext
         
     }
 
+   
+
     public DbSet<User> Users;
 }

@@ -56,5 +56,10 @@ namespace Authenticator.Repository
             return userToUpdate;
         }
 
+        public User FindUserByEmail(string email)
+        {
+            return _userDataContext.Users.Where(x => x.Email == email).First();
+        }
+
     }
 }

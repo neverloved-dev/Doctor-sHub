@@ -36,9 +36,9 @@ public class AuthenthicationController : Controller
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<User>> LogIn(UserLoginDTO request)
+    public async Task<ActionResult<User>> LogIn(UserLoginDTO request,Roles role)
     {
-        var userDto = _userService.getUserByEmail(request.Email);
+        var userDto = _userService.FindUserObjectByEmail(request.Email);
         if (userDto == null)
         {
             return NotFound("User not found!");
@@ -49,7 +49,7 @@ public class AuthenthicationController : Controller
         {
             return BadRequest("Wrong password!");
         }
-        var token = _tokenService.CreateToken(user);
+        var token = _tokenService.CreateToken(user,role);
         return Ok(token);
     }
 
