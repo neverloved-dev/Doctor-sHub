@@ -39,5 +39,13 @@ namespace Authenticator.Service
             doctor.Specialization = registerDoctorDto.Specialization;
             repository.Create(doctor);
         }
+
+        public GetDoctorDTO EditDoctorData(Doctor doctor)
+        {
+            Doctor finalDoctorData = repository.Update(doctor);
+            GetDoctorDTO doctorDTO = finalDoctorData.MapToGetDTO();
+            return doctorDTO;
+
+        }
     }
 }
