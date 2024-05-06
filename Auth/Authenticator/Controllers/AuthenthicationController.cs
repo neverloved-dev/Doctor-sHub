@@ -7,15 +7,22 @@ namespace Authenticator.Controllers;
 
 public class AuthenthicationController : Controller
 {
-    private IConfiguration _configuration ;
+    private IConfiguration _configuration;
     private TokenService _tokenService;
     private UserService _userService;
-    public AuthenthicationController(IConfiguration configuration,TokenService tokenService,UserService userService)
+    public AuthenthicationController(IConfiguration configuration, TokenService tokenService, UserService userService)
     {
         this._configuration = configuration;
         this._tokenService = tokenService;
         this._userService = userService;
     }
+
+    [HttpPost("/admin/doctor/register")]
+    [HttpDelete("/admin/doctor/delete/{doctorId}")]
+    [HttpPost("/admin/assistant/register")]
+    [HttpDelete("/admin/assistant/delete/{doctorId}")]
+
+
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(UserRegisterDTO request)
     {
@@ -45,4 +52,5 @@ public class AuthenthicationController : Controller
         var token = _tokenService.CreateToken(user);
         return Ok(token);
     }
+
 }

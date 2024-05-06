@@ -47,7 +47,7 @@ public class TokenService
         var token = new JwtSecurityToken(
             claims: new[]
             {
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Role, user.Name),
             },
             expires: DateTime.Now.AddDays(10),
             signingCredentials: cred
