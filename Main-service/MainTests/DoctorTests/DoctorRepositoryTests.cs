@@ -2,6 +2,7 @@ namespace MainTests
 {
     public class DoctorRepositoryTests
     {
+
         [Theory]
         [InlineData(3)]
         [InlineData(4)]

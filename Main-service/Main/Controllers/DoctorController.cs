@@ -1,4 +1,5 @@
 ﻿using Main.DTOs;
+using Main.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +8,14 @@ namespace Main.Controllers
 {
     [Route("api/doctors")]
     [ApiController]
-    public class DoctorController : ControllerBase
+    public class DoctorController : ControllerBase //TODO: Implement controller with the service
     {
+        private readonly DoctorService _doctorService;
+        public DoctorController(DoctorService doctorService)
+        {
+            _doctorService = doctorService;
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Doctor")]
         public Task<GetDoctorDTO> GetDoctorInfo(int id)
@@ -43,7 +50,5 @@ namespace Main.Controllers
         {
             return null;
         }
-
-        
     }
 }
