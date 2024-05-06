@@ -14,7 +14,7 @@ namespace Authenticator.DTOs
         public string LastName { get; set; }
         public int YearsOfExperience { get; set; }
         [Required]
-        public string Department {  get; set; }
+        public string Specialization {  get; set; }
 
     }
 }

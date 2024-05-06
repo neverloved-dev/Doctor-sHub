@@ -1,4 +1,5 @@
 ﻿using Authenticator.DTOs;
+using Authenticator.Models;
 using Authenticator.Repository;
 
 namespace Authenticator.Service
@@ -27,6 +28,16 @@ namespace Authenticator.Service
             var doctorObject = repository.GetSingle(doctorId);
             GetDoctorDTO getDoctorDTO = doctorObject.MapToGetDTO();
             return getDoctorDTO;
+        }
+
+        public void CreateDoctor(DoctorRegisterDTO registerDoctorDto)
+        {
+            Doctor doctor = new Doctor();
+            doctor.LastName = registerDoctorDto.LastName;
+            doctor.Name = registerDoctorDto.Name;
+            doctor.YearsOfExperience = registerDoctorDto.YearsOfExperience;
+            doctor.Specialization = registerDoctorDto.Specialization;
+            repository.Create(doctor);
         }
     }
 }
