@@ -45,7 +45,11 @@ namespace Authenticator.Service
             Doctor finalDoctorData = repository.Update(doctor);
             GetDoctorDTO doctorDTO = finalDoctorData.MapToGetDTO();
             return doctorDTO;
+        }
 
+        public void DeleteDoctor(int doctorId)
+        {
+            repository.Delete(doctorId);
         }
     }
 }
