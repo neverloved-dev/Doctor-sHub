@@ -7,6 +7,13 @@ public class UserService
 {
     private UserDataContext _dataContext;
     private TokenService _tokenService;
+
+    public UserService(UserDataContext dataContext, TokenService tokenService)
+    {
+        _dataContext = dataContext;
+        _tokenService = tokenService;
+    }
+
     public GetUserDTO getUserByEmail(string userEmail)
     {
         var user = FindUserObjectByEmail(userEmail);
