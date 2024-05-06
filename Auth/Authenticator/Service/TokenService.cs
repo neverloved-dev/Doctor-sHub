@@ -36,7 +36,7 @@ public class TokenService
 
     public string CreateToken(User user)
     {
-        var tokenKeyValue = _configuration["AppSettings:Token"];
+        var tokenKeyValue = _configuration.GetSection("AppSettings:Token").Value;
         if (string.IsNullOrEmpty(tokenKeyValue))
         {
             throw new InvalidOperationException("Token key is missing or empty in the configuration.");

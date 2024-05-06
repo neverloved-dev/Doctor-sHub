@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace Authenticator.Repository
 {
-    public class DoctorRepository : ICrudRepository<Doctor>
+    public class UserRepository : ICrudRepository<User>
     {
         private readonly UserDataContext _userDataContext;
-        public DoctorRepository(UserDataContext userDataContext)
+        public UserRepository(UserDataContext userDataContext)
         {
             _userDataContext = userDataContext;
         }
-        public void Create(Doctor variable)
+        public void Create(User variable)
         {
             _userDataContext.Add(variable);
             _userDataContext.SaveChanges();
@@ -21,8 +21,8 @@ namespace Authenticator.Repository
         {
             try
             {
-                var doctorToDelete = _userDataContext?.Doctors.Find(identifier);
-                _userDataContext.Remove<Doctor>(doctorToDelete);
+                var userToDelete = _userDataContext?.Users.Find(identifier);
+                _userDataContext.Remove<User>(userToDelete);
                 _userDataContext.SaveChanges();
             }
             catch(NullReferenceException exception)
@@ -36,26 +36,25 @@ namespace Authenticator.Repository
             
         }
 
-        public List<Doctor> GetAll()
+        public List<User> GetAll()
         {
-            return _userDataContext.Doctors.ToList();
+            return _userDataContext.Users.ToList();
         }
 
-        public Doctor GetSingle(object identifier)
+        public User GetSingle(object identifier)
         {
-            return _userDataContext.Doctors.Find(identifier);
+            return _userDataContext.Users.Find(identifier);
         }
 
-        public Doctor Update(Doctor update)
+        public User Update(User update)
         {
-            var doctorToUpdate = _userDataContext.Doctors.Find(update.Id);
-            doctorToUpdate.Name = update.Name;
-            doctorToUpdate.LastName = update.LastName;
-            doctorToUpdate.Specialization = update.Specialization;
-            doctorToUpdate.YearsOfExperience = update.YearsOfExperience;
-            _userDataContext.Doctors.Update(doctorToUpdate);
+            var userToUpdate = _userDataContext.Users.Find(update.Id);
+            userToUpdate.Name = update.Name;
+            userToUpdate.LastName = update.LastName;
+            _userDataContext.Users.Update(userToUpdate);
             _userDataContext.SaveChanges();
-            return doctorToUpdate;
+            return userToUpdate;
         }
+
     }
 }

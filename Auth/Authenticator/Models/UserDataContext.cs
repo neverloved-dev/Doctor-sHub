@@ -8,5 +8,4 @@ public class UserDataContext:DbContext
     }
 
     public DbSet<User> Users;
-    public DbSet<Doctor> Doctors;
 }
