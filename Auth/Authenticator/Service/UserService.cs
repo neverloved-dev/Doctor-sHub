@@ -41,4 +41,15 @@ public class UserService
        _dataContext.Users.Add(userObject);
        _dataContext.SaveChanges();
     }
+
+    public void DeleteUser(int id)
+    {
+        var userToDelete = _dataContext.Users.Find(id);
+        _dataContext.Users.Remove(userToDelete);
+    }
+
+    public List<User> GetAllUsers()
+    {
+        return _dataContext.Users.ToList();
+    }
 }
