@@ -15,13 +15,16 @@ using System.Threading.Tasks;
 public class UserServiceTests:IDisposable
 {
     private IConfiguration configuration;
+    private UserRepository userRepository;
+    private TokenService tokenService;
+    private UserService userService;
     public UserServiceTests() 
     {
         
         var db = GetInMemoryContext();
-        UserRepository userRepository = new UserRepository(db);
-        TokenService tokenService = new TokenService(configuration);
-        UserService userService = new UserService(userRepository,tokenService);
+         userRepository = new UserRepository(db);
+         tokenService = new TokenService(configuration);
+         userService = new UserService(userRepository, tokenService);
         
 
     }
@@ -45,73 +48,89 @@ public class UserServiceTests:IDisposable
     [Fact]
     public void FindUserObjectByEmail_Returns_User_When_UserExists()
     {
-        // Arrange
-        var options = new DbContextOptionsBuilder<UserDataContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
-            .Options;
-
-        using (var context = new UserDataContext(options))
-        {
-            // Seed test data
-            context.Users.Add(new User { Email = "test@example.com" /* Add more properties as needed */ });
-            context.SaveChanges();
-
-            var userRepository = new UserRepository(context);
-            var tokenService = tokenService;
-
-            var userService = new UserService(userRepository, tokenService);
-
-            // Act
-            var result = userService.FindUserObjectByEmail("test@example.com");
-
-            // Assert
-            Assert.NotNull(result);
-            // Add assertions to verify the correctness of returned user
-        }
+        User user = new User();
+        Random rnd = new Random();
+        user.Id = rnd.Next(1, 99);
+        user.DateOfBirth = DateTime.UtcNow;
+        user.PhoneNumber = Guid.NewGuid().ToString();
+        user.Role = Roles.Patient;
+        user.Email = "testmail@mail.com";
+        user.Name = "Test";
+        user.LastName = "Last Test";
+        byte[] passwordHash = { };
+        byte[] passwordSalt = { };
+        user.PasswordHash = passwordHash;
+        user.PasswordSalt = passwordSalt;
+        userRepository.Create(user);
+        var foundUser = userService.FindUserObjectByEmail(user.Email);
+        Assert.NotNull(foundUser);
+        Assert.Equal(user.Email, foundUser.Email);
+        Assert.Equal(user.Name, foundUser.Name);
     }
 
     [Fact]
     public void AddUser_Creates_New_User()
     {
-        // Arrange
-        var options = new DbContextOptionsBuilder<UserDataContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
-            .Options;
-
-        using (var context = new UserDataContext(options))
-        {
-            var userRepository = new UserRepository(context);
-            var tokenService = _tokenService;
-
-            var userService = new UserService(userRepository, tokenService);
-
-            var userDto = new UserRegisterDTO { /* Populate user registration DTO */ };
-
-            // Act
-            userService.AddUser(userDto);
-
-            // Assert
-            Assert.Single(context.Users); // Ensure only one user is added
-            // Add more assertions as needed to verify the correctness of added user
-        }
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
+        userRegisterDTO.Email = "test2mail.com";
+        userRegisterDTO.Name = "Test";
+        userRegisterDTO.LastName = "Last Test Name";
+        userRegisterDTO.PhoneNumber = Guid.NewGuid().ToString(); 
+        userRegisterDTO.DateOfBirth = DateTime.UtcNow;
+        userRegisterDTO.Password = "MySuperStrongPassword";
+        userRegisterDTO.Role = Roles.Doctor;
+        userService.AddUser(userRegisterDTO);
+        var foundUser = userRepository.FindUserByEmail(userRegisterDTO.Email);
+        Assert.NotNull(foundUser);
+        Assert.Equal(userRegisterDTO.Email, foundUser.Email);
+        Assert.Equal(userRegisterDTO.DateOfBirth, foundUser.DateOfBirth);
+        Assert.Equal(userRegisterDTO.PhoneNumber,foundUser.PhoneNumber);
     }
 
-    [Fact]
-    public void AddUser_CreatesNewUser()
-    {
-
-    }
 
     [Fact]
     public void GetAllUsers_ReturnsAllUsers()
     {
+        // Arrange
+        var users = new List<User>
+    {
+        new User { Id = 1, Email = "user1@example.com", Name = "User1", LastName = "Last1", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567890" },
+        new User { Id = 2, Email = "user2@example.com", Name = "User2", LastName = "Last2", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567891" },
+        new User { Id = 3, Email = "user3@example.com", Name = "User3", LastName = "Last3", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567892" }
+    };
+        foreach (var user in users)
+        {
+            userRepository.Create(user);
+        }
 
+        // Act
+        var allUsers = userService.GetAllUsers();
+
+        // Assert
+        Assert.NotNull(allUsers);
+        Assert.Equal(users.Count, allUsers.Count);
+
+        foreach (var user in users)
+        {
+            Assert.Contains(allUsers, u => u.Id == user.Id && u.Email == user.Email && u.Name == user.Name && u.LastName == user.LastName && u.PasswordHash != null && u.PasswordSalt != null && u.PhoneNumber == user.PhoneNumber);
+        }
     }
 
     [Fact]
     public void DeleteUser_Deletes_User()
     {
+        // Arrange
+        var user = new User { Id = 1, Email = "deleteuser@example.com", Name = "DeleteUser", LastName = "Last", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567890" };
+        userRepository.Create(user);
 
+        // Act
+        userService.DeleteUser(user.Id);
+
+        // Assert
+        var deletedUser = userRepository.GetSingle(user.Id);
+        Assert.Null(deletedUser);
     }
+
+
 
 }

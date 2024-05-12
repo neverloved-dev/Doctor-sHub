@@ -6,14 +6,14 @@ namespace Authenticator.Repository
 {
     public class UserRepository : ICrudRepository<User>
     {
-        private readonly UserDataContext _userDataContext;
+        private  UserDataContext _userDataContext;
         public UserRepository(UserDataContext userDataContext)
         {
             _userDataContext = userDataContext;
         }
         public void Create(User variable)
         {
-            _userDataContext.Add(variable);
+            _userDataContext.Users.Add(variable);
             _userDataContext.SaveChanges();
         }
 

@@ -1,4 +1,6 @@
-﻿namespace Authenticator.DTOs;
+﻿using Authenticator.Models;
+
+namespace Authenticator.DTOs;
 
 public class UserRegisterDTO
 {
@@ -8,4 +10,5 @@ public class UserRegisterDTO
     public string PhoneNumber { get; set; }
     public string LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
+    public Roles Role {  get; set; }
 }
