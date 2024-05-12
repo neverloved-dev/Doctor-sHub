@@ -69,12 +69,12 @@ namespace AuthenticatorTests
         {
             // Arrange
             var configuration = new Mock<IConfiguration>();
-            configuration.Setup(x => x.GetSection("AppSettings:Token").Value).Returns("supersecretkey");
+            configuration.Setup(x => x.GetSection("AppSettings:Token").Value).Returns("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IngwbnIiLCJzdWIiOiJ4MG5yIiwianRpIjoiZmRkMmYzYTAiLCJhdWQiOlsiaHR0cDovL2xvY2FsaG9zdDo1ODk5MiIsImh0dHBzOi8vbG9jYWxob3N0OjAiLCJodHRwOi8vbG9jYWxob3N0OjUxMjIiXSwibmJmIjoxNzE1MDExNTkxLCJleHAiOjE3MjI5NjAzOTEsImlhdCI6MTcxNTAxMTU5MiwiaXNzIjoiZG90bmV0LXVzZXItand0cyJ9.QaI5vPGK6ei4fP-6IAjJwrjF1Os0Tgrqnt-buqcPyBk");
             var tokenService = new TokenService(configuration.Object);
             var user = new User { Name = "TestUser" };
 
             // Act
-             var token = tokenService.CreateToken(user);
+             var token = tokenService.CreateToken(user,Roles.Admin);
 
             // Assert
             Assert.NotNull(token);

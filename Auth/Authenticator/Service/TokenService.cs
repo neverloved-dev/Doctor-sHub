@@ -34,9 +34,9 @@ public class TokenService
         }
     }
 
-    public string CreateToken(User user)
+    public string CreateToken(User user,Roles role)
     {
-        var tokenKeyValue = _configuration["AppSettings:Token"];
+        var tokenKeyValue = _configuration.GetSection("AppSettings:Token").Value;
         if (string.IsNullOrEmpty(tokenKeyValue))
         {
             throw new InvalidOperationException("Token key is missing or empty in the configuration.");
@@ -47,7 +47,7 @@ public class TokenService
         var token = new JwtSecurityToken(
             claims: new[]
             {
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Role, role.ToString()),
             },
             expires: DateTime.Now.AddDays(10),
             signingCredentials: cred

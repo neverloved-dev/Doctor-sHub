@@ -7,15 +7,22 @@ namespace Authenticator.Controllers;
 
 public class AuthenthicationController : Controller
 {
-    private IConfiguration _configuration ;
+    private IConfiguration _configuration;
     private TokenService _tokenService;
     private UserService _userService;
-    public AuthenthicationController(IConfiguration configuration,TokenService tokenService,UserService userService)
+    public AuthenthicationController(IConfiguration configuration, TokenService tokenService, UserService userService)
     {
         this._configuration = configuration;
         this._tokenService = tokenService;
         this._userService = userService;
     }
+
+    [HttpPost("/admin/doctor/register")]
+    [HttpDelete("/admin/doctor/delete/{doctorId}")]
+    [HttpPost("/admin/assistant/register")]
+    [HttpDelete("/admin/assistant/delete/{doctorId}")]
+
+
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(UserRegisterDTO request)
     {
@@ -29,9 +36,9 @@ public class AuthenthicationController : Controller
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<User>> LogIn(UserLoginDTO request)
+    public async Task<ActionResult<User>> LogIn(UserLoginDTO request,Roles role)
     {
-        var userDto = _userService.getUserByEmail(request.Email);
+        var userDto = _userService.FindUserObjectByEmail(request.Email);
         if (userDto == null)
         {
             return NotFound("User not found!");
@@ -42,7 +49,8 @@ public class AuthenthicationController : Controller
         {
             return BadRequest("Wrong password!");
         }
-        var token = _tokenService.CreateToken(user);
+        var token = _tokenService.CreateToken(user,role);
         return Ok(token);
     }
+
 }

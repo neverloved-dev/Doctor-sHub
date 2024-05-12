@@ -2,86 +2,135 @@
 
 using Authenticator.DTOs;
 using Authenticator.Models;
+using Authenticator.Repository;
 using Authenticator.Service;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class UserServiceTests
+public class UserServiceTests:IDisposable
 {
-    [Fact]
-    public void GetUserByEmail_Returns_UserDTO_When_UserExists()
+    private IConfiguration configuration;
+    private UserRepository userRepository;
+    private TokenService tokenService;
+    private UserService userService;
+    public UserServiceTests() 
     {
-        // Arrange
-        var userEmail = "test@example.com";
-        var expectedUserDto = new GetUserDTO { /* Populate expected user DTO */ };
+        
+        var db = GetInMemoryContext();
+         userRepository = new UserRepository(db);
+         tokenService = new TokenService(configuration);
+         userService = new UserService(userRepository, tokenService);
+        
 
-        var userService = new UserService(MockDataContextWithExistingUser(), MockTokenService());
-
-        // Act
-        var result = userService.FindUserObjectByEmail(userEmail);
-
-        // Assert
-        Assert.NotNull(result);
-        // Add more assertions to verify the correctness of returned DTO
     }
 
-    [Fact]
-    public void GetUserByEmail_Returns_Null_When_UserDoesNotExist()
+    public UserDataContext GetInMemoryContext()
     {
-        // Arrange
-        var userEmail = "nonexistent@example.com";
-        var userService = new UserService(MockDataContextWithoutUser(), MockTokenService());
+        var options = new DbContextOptionsBuilder<UserDataContext>()
+        .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+        .Options;
+        return new UserDataContext(options);
+    }
+    public void Dispose()
+    {
+        using (var context = GetInMemoryContext())
+        {
+            context.Database.EnsureDeleted();
+        }
+    }
 
-        // Act
-        var result = userService.FindUserObjectByEmail(userEmail);
 
-        // Assert
-        Assert.Null(result);
+    [Fact]
+    public void FindUserObjectByEmail_Returns_User_When_UserExists()
+    {
+        User user = new User();
+        Random rnd = new Random();
+        user.Id = rnd.Next(1, 99);
+        user.DateOfBirth = DateTime.UtcNow;
+        user.PhoneNumber = Guid.NewGuid().ToString();
+        user.Role = Roles.Patient;
+        user.Email = "testmail@mail.com";
+        user.Name = "Test";
+        user.LastName = "Last Test";
+        byte[] passwordHash = { };
+        byte[] passwordSalt = { };
+        user.PasswordHash = passwordHash;
+        user.PasswordSalt = passwordSalt;
+        userRepository.Create(user);
+        var foundUser = userService.FindUserObjectByEmail(user.Email);
+        Assert.NotNull(foundUser);
+        Assert.Equal(user.Email, foundUser.Email);
+        Assert.Equal(user.Name, foundUser.Name);
     }
 
     [Fact]
     public void AddUser_Creates_New_User()
     {
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
+        userRegisterDTO.Email = "test2mail.com";
+        userRegisterDTO.Name = "Test";
+        userRegisterDTO.LastName = "Last Test Name";
+        userRegisterDTO.PhoneNumber = Guid.NewGuid().ToString(); 
+        userRegisterDTO.DateOfBirth = DateTime.UtcNow;
+        userRegisterDTO.Password = "MySuperStrongPassword";
+        userRegisterDTO.Role = Roles.Doctor;
+        userService.AddUser(userRegisterDTO);
+        var foundUser = userRepository.FindUserByEmail(userRegisterDTO.Email);
+        Assert.NotNull(foundUser);
+        Assert.Equal(userRegisterDTO.Email, foundUser.Email);
+        Assert.Equal(userRegisterDTO.DateOfBirth, foundUser.DateOfBirth);
+        Assert.Equal(userRegisterDTO.PhoneNumber,foundUser.PhoneNumber);
+    }
+
+
+    [Fact]
+    public void GetAllUsers_ReturnsAllUsers()
+    {
         // Arrange
-        var userDto = new UserRegisterDTO { /* Populate user registration DTO */ };
-        var userService = new UserService(MockDataContext(), MockTokenService());
+        var users = new List<User>
+    {
+        new User { Id = 1, Email = "user1@example.com", Name = "User1", LastName = "Last1", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567890" },
+        new User { Id = 2, Email = "user2@example.com", Name = "User2", LastName = "Last2", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567891" },
+        new User { Id = 3, Email = "user3@example.com", Name = "User3", LastName = "Last3", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567892" }
+    };
+        foreach (var user in users)
+        {
+            userRepository.Create(user);
+        }
 
         // Act
-        userService.AddUser(userDto);
+        var allUsers = userService.GetAllUsers();
 
         // Assert
-        // Verify user is added to data context by querying or any other means
+        Assert.NotNull(allUsers);
+        Assert.Equal(users.Count, allUsers.Count);
+
+        foreach (var user in users)
+        {
+            Assert.Contains(allUsers, u => u.Id == user.Id && u.Email == user.Email && u.Name == user.Name && u.LastName == user.LastName && u.PasswordHash != null && u.PasswordSalt != null && u.PhoneNumber == user.PhoneNumber);
+        }
     }
 
-    // Helper methods to mock dependencies
-
-    private UserDataContext MockDataContextWithExistingUser()
+    [Fact]
+    public void DeleteUser_Deletes_User()
     {
-        var mockDataContext = new Mock<UserDataContext>();
-        mockDataContext.Setup(dc => dc.Users).Returns((Microsoft.EntityFrameworkCore.DbSet<User>)new[] { new User() }.AsQueryable());
-        return mockDataContext.Object;
+        // Arrange
+        var user = new User { Id = 1, Email = "deleteuser@example.com", Name = "DeleteUser", LastName = "Last", PasswordHash = new byte[1], PasswordSalt = new byte[1], PhoneNumber = "1234567890" };
+        userRepository.Create(user);
+
+        // Act
+        userService.DeleteUser(user.Id);
+
+        // Assert
+        var deletedUser = userRepository.GetSingle(user.Id);
+        Assert.Null(deletedUser);
     }
 
-    private UserDataContext MockDataContextWithoutUser()
-    {
-        var mockDataContext = new Mock<UserDataContext>();
-        mockDataContext.Setup(dc => dc.Users).Returns((Microsoft.EntityFrameworkCore.DbSet<User>)Enumerable.Empty<User>().AsQueryable());
-        return mockDataContext.Object;
-    }
 
-    private UserDataContext MockDataContext()
-    {
-        var mockDataContext = new Mock<UserDataContext>();
-        mockDataContext.Setup(dc => dc.Users).Returns((Microsoft.EntityFrameworkCore.DbSet<User>)new List<User>().AsQueryable());
-        return mockDataContext.Object;
-    }
 
-    private TokenService MockTokenService()
-    {
-        var mockTokenService = new Mock<TokenService>();
-        return mockTokenService.Object;
-    }
 }

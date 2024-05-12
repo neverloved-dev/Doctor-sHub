@@ -1,30 +1,24 @@
 ﻿using Authenticator.DTOs;
 using Authenticator.Models;
+using Authenticator.Repository;
 
 namespace Authenticator.Service;
 
 public class UserService
 {
-    private UserDataContext _dataContext;
+    private UserRepository _userRepository;
     private TokenService _tokenService;
 
-    public UserService(UserDataContext dataContext, TokenService tokenService)
+    public UserService(UserRepository userRepository, TokenService tokenService)
     {
-        _dataContext = dataContext;
+        _userRepository = userRepository;
         _tokenService = tokenService;
     }
 
-    public GetUserDTO getUserByEmail(string userEmail)
-    {
-        var user = FindUserObjectByEmail(userEmail);
-        var userDto = user.MapToGetDTO();
-        return userDto;
-    }
-
+  
     public User FindUserObjectByEmail(string userEmail)
     {
-        var user = _dataContext.Users.Where(s=>s.Email == userEmail).First();
-        return user;
+        return _userRepository.FindUserByEmail(userEmail);
     }
 
     public void AddUser(UserRegisterDTO user)
@@ -38,7 +32,21 @@ public class UserService
        _tokenService.CreatePasswordHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
        userObject.PasswordHash = passwordHash;
        userObject.PasswordSalt = passwordSalt;
-       _dataContext.Users.Add(userObject);
-       _dataContext.SaveChanges();
+        _userRepository.Create(userObject);
+    }
+
+    public void DeleteUser(int id)
+    {
+        _userRepository.Delete(id);
+    }
+
+    public List<User> GetAllUsers()
+    {
+        return _userRepository.GetAll();
+    }
+
+    public User EditUser(User user)
+    {
+        return _userRepository.Update(user);
     }
 }
