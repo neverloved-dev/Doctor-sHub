@@ -27,8 +27,8 @@ jobs:
     - name: Test Authenticator
       run: dotnet test ./Auth/Authenticator/Authenticator.sln --no-build --verbosity normal
     - name: Restore dependencies for Main
-      run: dotnet resotre "./Main-service/Main/Main.sln" --verbosity diag
+      run: dotnet resotre ./Main-service/Main/Main.sln --verbosity diag
     - name: Build Main
-      run: dotnet build "./Main-service/Main/Main.sln" --no-restore
+      run: dotnet build ./Main-service/Main/Main.sln --no-restore
     - name: Test Main
-      run: dotnet test "./Main-service/Main/Main.sln" --no-build --verbosity normal
+      run: dotnet test ./Main-service/Main/Main.sln --no-build --verbosity normal
