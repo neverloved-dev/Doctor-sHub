@@ -1,5 +1,8 @@
+
+using Main.Models;
 using Main.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -35,8 +38,9 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
                 builder.Configuration.GetSection("AppSettings:Token").Value!))
     };
 });
-builder.Services.AddScoped<DoctorService, DoctorService>();
 builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddDbContext<MainDataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Main")));
+builder.Services.AddScoped<PrescriptionService,PrescriptionService>();
 
 var app = builder.Build();
 
