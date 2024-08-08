@@ -1,10 +1,8 @@
-﻿using Main.Interfaces;
-using Main.Models;
+﻿using Main.Models;
 
 namespace Main.Repositories;
 
-public class DoctorRepository : ICrudRepository<Doctor> //TODO: Implement CRUD repository and then use them in the Service.
-{
+public class DoctorRepository {
     public void Create(Doctor variable)
     {
         throw new NotImplementedException();

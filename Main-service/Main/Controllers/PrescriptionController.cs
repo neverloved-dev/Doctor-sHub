@@ -1,4 +1,5 @@
 ﻿using Main.DTOs;
+using Main.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +16,23 @@ namespace Main.Controllers
         }
         [HttpGet("{prescriptionid}")]
         [Authorize(Roles = "Patient")]
-        public Task<GetPrescriptionDTO> GetPrescriptionById(int prescriptionID) 
-            {
-            return null;
-            }
-
-        public Task<CreatePrescriptionDTO> CreateNewPrescription(CreatePrescriptionDTO prescription) 
+        public async Task<GetPrescriptionDTO> GetPrescriptionById(int prescriptionID)
         {
-            return null;
-        } 
+           return _service.GetPrescriptionById(prescriptionID);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Doctor")]
+        public void CreateNewPrescription(CreatePrescriptionDTO prescription) 
+        {
+            _service.CreateNewPrescription(prescription);
+        }
+
+        [HttpGet("{userId}")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<List<GetPrescriptionDTO>> GetPrescriptionForUser(int userId)
+        {
+            return _service.GetPrescriptionDtosById(userId);
+        }
     }
 }
