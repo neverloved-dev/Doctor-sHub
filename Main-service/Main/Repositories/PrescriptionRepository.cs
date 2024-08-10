@@ -14,6 +14,7 @@ public class PrescriptionRepository
     public void AddPrescription(Prescription createPrescriptionDTO)
     {
         _appContext.Prescriptions.Add(createPrescriptionDTO);
+        _appContext.SaveChanges();
     }
 
     public Prescription GetPrescription(int prescriptionId) => _appContext.Prescriptions.Find(prescriptionId);
