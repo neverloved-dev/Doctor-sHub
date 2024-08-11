@@ -1,4 +1,5 @@
-﻿using Main.Models;
+﻿using Main.DTOs;
+using Main.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,4 +50,17 @@ public class DoctorRepository
 
         return doctorToUpdate;
     }
+
+    public List<Doctor>? GetDoctorPaginated(int pageNumber, int pageSize)
+    {
+        IQueryable<Doctor> query = _context.Doctors;
+        int skipAmount = pageNumber * pageSize;
+
+        return query.Skip(skipAmount)
+            .Take(pageSize)
+            .ToList();
+        
+    }
+    
+    
 }

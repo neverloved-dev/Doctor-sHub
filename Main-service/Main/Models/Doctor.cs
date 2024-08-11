@@ -7,5 +7,5 @@ public class Doctor
     public string LastName { get; set; }
     public string Specialization { get; set; }
     public int YearsOfExperience { get; set; }
-    
+    public int PatientId { get; set; }
 }

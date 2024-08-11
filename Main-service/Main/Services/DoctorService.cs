@@ -15,9 +15,8 @@ namespace Main.Services
         {
             _doctorRepository = doctorRepository;
         }
-
-        //TODO: Implement CRUD operations with pagination using DoctorRepository
-        public GetDoctorDTO? GetSingleDoctor(int doctorId)
+        
+        public GetDoctorDTO GetSingleDoctor(int doctorId)
         {
             GetDoctorDTO? dto = new GetDoctorDTO();
             var doctor = _doctorRepository.GetSingle(doctorId);
@@ -28,6 +27,17 @@ namespace Main.Services
             dto.Speciality = doctor.Specialization;
             return dto;
 
+        }
+
+        public GetDoctorDTO UpdateDoctor(Doctor updateDoctor)
+        {
+           var newDoctor = _doctorRepository.Update(updateDoctor);
+           GetDoctorDTO dto = new GetDoctorDTO();
+           dto.Speciality = newDoctor.Specialization;
+           dto.YearsOfExperience = newDoctor.YearsOfExperience;
+           dto.Name = newDoctor.Name;
+           dto.LastName = newDoctor.LastName;
+           return dto;
         }
 
         public void AddNewDoctor(CreateDoctorDTO requestDto)
@@ -48,6 +58,16 @@ namespace Main.Services
         public void DeleteDoctor(int id)
         {
             _doctorRepository.Delete(id);
+        }
+
+        public List<GetPatientDTO>? ReturnPatientsForDoctor(int doctorId)
+        {
+            return null;
+        }
+
+        public GetPatientDTO? ReturnPatientForDoctor(int doctorId, int patientId)
+        {
+            return null;
         }
     }
 }
