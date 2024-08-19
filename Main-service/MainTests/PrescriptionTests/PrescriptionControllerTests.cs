@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 
-namespace MainTests.PrescriptionTests
+namespace PrescriptionControllerTests
 {
     public class PrescriptionControllerTests:IClassFixture<WebApplicationFactory<Program>>
     {

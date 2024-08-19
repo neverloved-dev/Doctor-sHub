@@ -18,7 +18,7 @@ namespace MainTests
                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
                .Options;
 
-            MainContext context = new MainContext();
+            MainContext context = new MainContext(options);
             _repository = new PrescriptionRepository(context);
         }
         
@@ -151,7 +151,10 @@ namespace MainTests
 
         public void Dispose()
         {
-            using (var context = new MainContext())
+            var options = new DbContextOptionsBuilder<MainContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+            using (var context = new MainContext(options))
             {
                 context.Database.EnsureDeleted();  
             }

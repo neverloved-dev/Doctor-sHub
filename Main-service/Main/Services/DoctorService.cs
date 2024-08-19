@@ -50,15 +50,30 @@ namespace Main.Services
             _doctorRepository.Create(newDoctor);
         }
         
-        public  List<GetDoctorDTO>? GetDoctorsPaginated()
+        public  List<GetDoctorDTO>? GetDoctorsPaginated(int pageNumber,int pageSize)
         {
-            return null;
+            var doctors = _doctorRepository.GetDoctorPaginated(pageNumber, pageSize);
+            if (doctors == null) return null;
+            List<GetDoctorDTO> finalList = new List<GetDoctorDTO>();
+            foreach (var doctor in doctors)
+            {
+                GetDoctorDTO dto = new GetDoctorDTO();
+                dto.Speciality = doctor.Specialization;
+                dto.LastName = doctor.LastName;
+                dto.Name = doctor.Name;
+                dto.YearsOfExperience = doctor.YearsOfExperience;
+                finalList.Add(dto);
+            }
+
+            return finalList;
         }
 
         public void DeleteDoctor(int id)
         {
             _doctorRepository.Delete(id);
         }
+        
+        // TODO: After finding the calendar algorithm
 
         public List<GetPatientDTO>? ReturnPatientsForDoctor(int doctorId)
         {
