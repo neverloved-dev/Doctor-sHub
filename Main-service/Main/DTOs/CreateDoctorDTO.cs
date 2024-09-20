@@ -1,11 +1,9 @@
-﻿namespace Main.Models;
+﻿namespace Main.DTOs;
 
-public class Doctor
+public class CreateDoctorDTO
 {
-    public int Id { get; set; }
     public string Name { get; set; }
     public string LastName { get; set; }
     public string Specialization { get; set; }
     public int YearsOfExperience { get; set; }
-    public int PatientId { get; set; }
 }

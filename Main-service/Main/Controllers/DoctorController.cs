@@ -1,4 +1,5 @@
 ﻿using Main.DTOs;
+using Main.Models;
 using Main.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ namespace Main.Controllers
 {
     [Route("api/doctors")]
     [ApiController]
-    public class DoctorController : ControllerBase //TODO: Implement controller with the service
+    public class DoctorController : ControllerBase
     {
         private readonly DoctorService _doctorService;
         public DoctorController(DoctorService doctorService)
@@ -18,25 +19,26 @@ namespace Main.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Doctor")]
-        public Task<GetDoctorDTO> GetDoctorInfo(int id)
+        public async Task<GetDoctorDTO> GetDoctorInfo(int id)
         {
-            return null;
+            return _doctorService.GetSingleDoctor(id);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Doctor")]
-        public Task<GetDoctorDTO> EditDoctorData(int id)
+        public async Task<GetDoctorDTO> EditDoctorData(Doctor doctor)
         {
-            return null;
+            return _doctorService.UpdateDoctor(doctor);
         }
 
-        [HttpGet("{id}/patients")]
-        [Authorize(Roles = "Doctor")]
-        public Task<PatientListDTO> PatientList(int id)
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public void DeleteDoctor(int id)
         {
-            return null;
+            _doctorService.DeleteDoctor(id);
         }
-
+        
+        // TODO: Do this with the calendar system
         [HttpDelete("{id}/patients/{patientId}")]
         [Authorize(Roles ="Doctor")]
         public Task DeletePatient(int id,int patientId)

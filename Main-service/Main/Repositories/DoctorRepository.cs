@@ -1,32 +1,66 @@
-﻿using Main.Interfaces;
+﻿using Main.DTOs;
 using Main.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Repositories;
 
-public class DoctorRepository : ICrudRepository<Doctor> //TODO: Implement CRUD repository and then use them in the Service.
+public class DoctorRepository
 {
+    private MainContext _context;
+
+    public DoctorRepository(MainContext context)
+    {
+        _context = context;
+    }
     public void Create(Doctor variable)
     {
-        throw new NotImplementedException();
+        _context.Doctors.Add(variable);
+        _context.SaveChanges();
     }
 
-    public Doctor Delete(object identifier)
+    public void Delete(int doctorId)
     {
-        throw new NotImplementedException();
+        var doctorToRemove = _context.Doctors.Find(doctorId);
+        if (doctorToRemove == null) return;
+        _context.Doctors.Remove(doctorToRemove);
+        _context.SaveChanges();
     }
 
     public List<Doctor> GetAll()
     {
-        throw new NotImplementedException();
+        return _context.Doctors.ToList();
     }
 
-    public Doctor GetSingle(object identifier)
+    public Doctor? GetSingle(int id)
     {
-        throw new NotImplementedException();
+        var doctor = _context.Doctors.Find(id);
+        return doctor ?? null;
     }
 
     public Doctor Update(Doctor update)
     {
-        throw new NotImplementedException();
+        var doctorToUpdate = _context.Doctors.Find(update.Id);
+        if (doctorToUpdate == null) return null;
+        doctorToUpdate.Name = update.Name;
+        doctorToUpdate.LastName = update.LastName;
+        doctorToUpdate.Specialization = update.Specialization;
+        doctorToUpdate.YearsOfExperience = update.YearsOfExperience;
+        _context.SaveChanges();
+
+        return doctorToUpdate;
     }
+
+    public List<Doctor>? GetDoctorPaginated(int pageNumber, int pageSize)
+    {
+        IQueryable<Doctor> query = _context.Doctors;
+        int skipAmount = pageNumber * pageSize;
+
+        return query.Skip(skipAmount)
+            .Take(pageSize)
+            .ToList();
+        
+    }
+    
+    
 }
